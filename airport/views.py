@@ -13,7 +13,7 @@ class AirportViewSet(viewsets.ModelViewSet):
 
 
 class RouteViewSet(viewsets.ModelViewSet):
-    queryset = Route.objects.all()
+    queryset = Route.objects.select_related("source", "destination")
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -27,7 +27,7 @@ class AirplaneTypeViewSet(viewsets.ModelViewSet):
 
 
 class AirplaneViewSet(viewsets.ModelViewSet):
-    queryset = Airplane.objects.all()
+    queryset = Airplane.objects.select_related()
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -41,7 +41,11 @@ class CrewViewSet(viewsets.ModelViewSet):
 
 
 class FlightViewSet(viewsets.ModelViewSet):
-    queryset = Flight.objects.all()
+    queryset = Flight.objects.select_related(
+            "route__source",
+            "route__destination",
+            "airplane",
+        ).prefetch_related("crews")
 
     def get_serializer_class(self):
         if self.action == "list":

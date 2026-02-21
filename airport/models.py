@@ -64,7 +64,7 @@ class Flight(models.Model):
     )
     departure_time = models.DateTimeField()
     arrival_time = models.DateTimeField()
-    crew = models.ManyToManyField(Crew, related_name="flights")
+    crews = models.ManyToManyField(Crew, related_name="flights")
 
     def __str__(self):
         return (f"{self.route}. Arrives to "

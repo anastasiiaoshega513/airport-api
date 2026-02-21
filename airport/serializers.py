@@ -10,14 +10,16 @@ class AirportSerializer(serializers.ModelSerializer):
 
 
 class RouteSerializer(serializers.ModelSerializer):
+    source = serializers.CharField(source="source.name", read_only=True)
+    destination = serializers.CharField(source="destination.name", read_only=True)
+
     class Meta:
         model = Route
         fields = ("id", "source", "destination", "distance")
 
 
 class RouteListSerializer(serializers.ModelSerializer):
-    source = serializers.CharField(source="source.name", read_only=True)
-    destination = serializers.CharField(source="destination.name", read_only=True)
+
     class Meta:
         model = Route
         fields = ("id", "source", "destination", "distance")
@@ -50,22 +52,33 @@ class CrewSerializer(serializers.ModelSerializer):
 
 
 class FlightSerializer(serializers.ModelSerializer):
+    route = serializers.PrimaryKeyRelatedField(
+        queryset=Route.objects.select_related("source", "destination")
+    )
+    crews = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Crew.objects.all(),
+    )
+    airplane = serializers.PrimaryKeyRelatedField(
+        queryset=Airplane.objects.all(),
+    )
+
     class Meta:
         model = Flight
         fields = (
-            "id", "route", "airplane", "departure_time", "arrival_time", "crew"
+            "id", "route", "airplane", "departure_time", "arrival_time", "crews"
         )
 
 
 class FlightListSerializer(serializers.ModelSerializer):
-    crew = serializers.StringRelatedField(many=True, read_only=True)
-    route = serializers.CharField(source="route.name", read_only=True)
+    crews = serializers.StringRelatedField(many=True, read_only=True)
+    route = serializers.StringRelatedField(read_only=True)
     airplane = serializers.CharField(source="airplane.name", read_only=True)
 
     class Meta:
         model = Flight
         fields = (
-            "id", "route", "airplane", "departure_time", "arrival_time", "crew"
+            "id", "route", "airplane", "departure_time", "arrival_time", "crews"
         )
 
 
