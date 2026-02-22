@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -23,6 +24,19 @@ class Route(models.Model):
         indexes = [
             models.Index(fields=["source", "destination"]),
         ]
+        unique_together = ("source", "destination")
+
+    @staticmethod
+    def validate_route(source: str, destination: str, error_to_raise):
+        if source == destination:
+            raise error_to_raise(
+                {
+                    "non_field_errors": "Source and destination must be different.",
+                }
+            )
+
+    def clean(self):
+        Route.validate_route(self.source, self.destination, ValidationError)
 
     def __str__(self):
         return f"{self.source} -> {self.destination}"
