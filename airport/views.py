@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from rest_framework import viewsets
+from rest_framework.pagination import PageNumberPagination
 
 from airport.models import Airport, Route, AirplaneType, Airplane, Crew, Flight, Order, Ticket
 from airport.serializers import AirportSerializer, RouteSerializer, AirplaneTypeSerializer, AirplaneSerializer, \
@@ -64,12 +65,19 @@ class CrewViewSet(viewsets.ModelViewSet):
     serializer_class = CrewSerializer
 
 
+class DefaultPagination(PageNumberPagination):
+    page_size = 5
+    page_size_query_param = "page_size"
+    max_page_size = 30
+
+
 class FlightViewSet(viewsets.ModelViewSet):
     queryset = Flight.objects.select_related(
             "route__source",
             "route__destination",
             "airplane",
         ).prefetch_related("crews")
+    pagination_class = DefaultPagination
 
     def get_queryset(self):
         source_name = self.request.query_params.get("source_name")
@@ -106,6 +114,7 @@ class FlightViewSet(viewsets.ModelViewSet):
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
+    pagination_class = DefaultPagination
 
 
 class TicketViewSet(viewsets.ModelViewSet):
