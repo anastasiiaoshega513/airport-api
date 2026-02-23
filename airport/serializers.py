@@ -22,6 +22,7 @@ class RouteSerializer(serializers.ModelSerializer):
             attrs["destination"],
             serializers.ValidationError
         )
+        return attrs
 
 
 class RouteListSerializer(serializers.ModelSerializer):
