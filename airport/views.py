@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from airport.models import Airport, Route, AirplaneType, Airplane, Crew, Flight, Order, Ticket
 from airport.serializers import AirportSerializer, RouteSerializer, AirplaneTypeSerializer, AirplaneSerializer, \
     CrewSerializer, FlightSerializer, OrderSerializer, TicketSerializer, RouteListSerializer, AirplaneListSerializer, \
-    FlightListSerializer, FlightDetailSerializer, AirplaneDetailSerializer, TicketSeatsSerializer
+    FlightListSerializer, FlightDetailSerializer, AirplaneDetailSerializer, TicketSeatsSerializer, OrderListSerializer
 
 
 class AirportViewSet(viewsets.ModelViewSet):
@@ -139,12 +139,23 @@ class FlightViewSet(viewsets.ModelViewSet):
         return Response(available)
 
 
+class TicketViewSet(viewsets.ModelViewSet):
+    queryset = Ticket.objects.all()
+    serializer_class = TicketSerializer
+
+
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     pagination_class = DefaultPagination
 
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
 
-class TicketViewSet(viewsets.ModelViewSet):
-    queryset = Ticket.objects.all()
-    serializer_class = TicketSerializer
+    def get_serializer_class(self):
+        if self.action == "list":
+            return OrderListSerializer
+        return OrderSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

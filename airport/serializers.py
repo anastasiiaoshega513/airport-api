@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from airport.models import Airport, Route, AirplaneType, Airplane, Crew, Flight, Order, Ticket
@@ -128,7 +129,7 @@ class TicketSerializer(serializers.ModelSerializer):
 
 
 class TicketListSerializer(TicketSerializer):
-    movie_session = FlightListSerializer(many=False, read_only=True)
+    flight = FlightListSerializer(many=False, read_only=True)
 
 
 class TicketSeatsSerializer(TicketSerializer):
@@ -137,11 +138,18 @@ class TicketSeatsSerializer(TicketSerializer):
         fields = ("row", "seat")
 
 
+class TicketCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ticket
+        fields = ("flight", "row", "seat")
+
+
 class OrderSerializer(serializers.ModelSerializer):
+    tickets = TicketCreateSerializer(many=True, allow_empty=False)
+
     class Meta:
         model = Order
-        fields = ("id", "created_at", "user")
-
+        fields = ("id", "tickets", "created_at")
 
     def create(self, validated_data):
         with transaction.atomic():
