@@ -113,6 +113,8 @@ class FlightDetailSerializer(serializers.ModelSerializer):
 
 
 class TicketSerializer(serializers.ModelSerializer):
+    flight = FlightListSerializer(many=False, read_only=True)
+
     def validate(self, attrs):
         data = super(TicketSerializer, self).validate(attrs=attrs)
         Ticket.validate_ticket(
@@ -129,7 +131,11 @@ class TicketSerializer(serializers.ModelSerializer):
 
 
 class TicketListSerializer(TicketSerializer):
-    flight = FlightListSerializer(many=False, read_only=True)
+    flight = serializers.CharField(source="flight.route", read_only=True)
+
+    class Meta:
+        model = Ticket
+        fields = ("id", "flight", "row", "seat")
 
 
 class TicketSeatsSerializer(TicketSerializer):
@@ -139,6 +145,7 @@ class TicketSeatsSerializer(TicketSerializer):
 
 
 class TicketCreateSerializer(serializers.ModelSerializer):
+    flight = serializers.CharField(source="flight.route", read_only=True)
     class Meta:
         model = Ticket
         fields = ("flight", "row", "seat")
@@ -161,4 +168,4 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class OrderListSerializer(OrderSerializer):
-    tickets = TicketListSerializer(many=True, read_only=True)
+    tickets = TicketCreateSerializer(many=True, read_only=True)

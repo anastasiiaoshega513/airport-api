@@ -1,4 +1,4 @@
-from django.db.models import F, Count
+from django.db.models import F, Count, Prefetch
 from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -8,7 +8,8 @@ from rest_framework.response import Response
 from airport.models import Airport, Route, AirplaneType, Airplane, Crew, Flight, Order, Ticket
 from airport.serializers import AirportSerializer, RouteSerializer, AirplaneTypeSerializer, AirplaneSerializer, \
     CrewSerializer, FlightSerializer, OrderSerializer, TicketSerializer, RouteListSerializer, AirplaneListSerializer, \
-    FlightListSerializer, FlightDetailSerializer, AirplaneDetailSerializer, TicketSeatsSerializer, OrderListSerializer
+    FlightListSerializer, FlightDetailSerializer, AirplaneDetailSerializer, TicketSeatsSerializer, OrderListSerializer, \
+    TicketListSerializer
 
 
 class AirportViewSet(viewsets.ModelViewSet):
@@ -140,8 +141,21 @@ class FlightViewSet(viewsets.ModelViewSet):
 
 
 class TicketViewSet(viewsets.ModelViewSet):
-    queryset = Ticket.objects.all()
-    serializer_class = TicketSerializer
+    queryset = Ticket.objects.select_related(
+        "flight",
+        "flight__route",
+        "flight__route__source",
+        "flight__route__destination",
+        "flight__airplane",
+        "order"
+    ).prefetch_related(
+        "flight__crews"
+    )
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return TicketListSerializer
+        return TicketSerializer
 
 
 class OrderViewSet(viewsets.ModelViewSet):
@@ -150,7 +164,19 @@ class OrderViewSet(viewsets.ModelViewSet):
     pagination_class = DefaultPagination
 
     def get_queryset(self):
-        return Order.objects.filter(user=self.request.user)
+        tickets_qs = (Ticket.objects.select_related(
+                "flight",
+                "flight__route",
+                "flight__route__source",
+                "flight__route__destination",
+            )
+        )
+        return (
+            Order.objects
+            .filter(user=self.request.user)
+            .prefetch_related(Prefetch("tickets", queryset=tickets_qs))
+            .order_by("-created_at")
+        )
 
     def get_serializer_class(self):
         if self.action == "list":
