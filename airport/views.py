@@ -1,11 +1,14 @@
+from django.db.models import F, Count
 from django.shortcuts import render
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 
 from airport.models import Airport, Route, AirplaneType, Airplane, Crew, Flight, Order, Ticket
 from airport.serializers import AirportSerializer, RouteSerializer, AirplaneTypeSerializer, AirplaneSerializer, \
     CrewSerializer, FlightSerializer, OrderSerializer, TicketSerializer, RouteListSerializer, AirplaneListSerializer, \
-    FlightListSerializer, FlightDetailSerializer, AirplaneDetailSerializer
+    FlightListSerializer, FlightDetailSerializer, AirplaneDetailSerializer, TicketSeatsSerializer
 
 
 class AirportViewSet(viewsets.ModelViewSet):
@@ -76,7 +79,12 @@ class FlightViewSet(viewsets.ModelViewSet):
             "route__source",
             "route__destination",
             "airplane",
-        ).prefetch_related("crews")
+        ).prefetch_related("crews").annotate(
+            available_seats=(
+                F("airplane__rows") * F("airplane__seats_in_row")
+                - Count("tickets")
+            )
+        )
     pagination_class = DefaultPagination
 
     def get_queryset(self):
@@ -106,9 +114,29 @@ class FlightViewSet(viewsets.ModelViewSet):
             return FlightListSerializer
         elif self.action == "retrieve":
             return FlightDetailSerializer
+        elif self.action == "available_seats":
+            return TicketSeatsSerializer
         return FlightSerializer
 
+    @action(
+        detail=True,
+        methods=["get"],
+        url_path="available-seats",
+    )
+    def available_seats(self, request, pk=None):
+        flight = self.get_object()
+        airplane = flight.airplane
 
+        taken = set(
+            Ticket.objects.filter(flight=flight).values_list("row", "seat")
+        )
+        available = []
+        for row in range(1, airplane.rows + 1):
+            for seat in range(1, airplane.seats_in_row + 1):
+                if (row, seat) not in taken:
+                    available.append({"row": row, "seat": seat})
+
+        return Response(available)
 
 
 class OrderViewSet(viewsets.ModelViewSet):
