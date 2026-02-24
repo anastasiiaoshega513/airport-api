@@ -6,14 +6,14 @@ from airport.views import AirportViewSet, RouteViewSet, AirplaneTypeViewSet, Air
 from rest_framework import routers
 
 router = routers.DefaultRouter()
-router.register("airports", AirportViewSet)
-router.register("routes", RouteViewSet)
-router.register("airplane_types", AirplaneTypeViewSet)
-router.register("airplanes", AirplaneViewSet)
-router.register("crews", CrewViewSet)
-router.register("orders", OrderViewSet)
-router.register("flights", FlightViewSet)
-router.register("tickets", TicketViewSet)
+router.register("airports", AirportViewSet, basename="airport")
+router.register("airplane_types", AirplaneTypeViewSet, basename="airplane-type")
+router.register("airplanes", AirplaneViewSet, basename="airplane")
+router.register("crews", CrewViewSet, basename="crew")
+router.register("routes", RouteViewSet, basename="route")
+router.register("flights", FlightViewSet, basename="flight")
+router.register("orders", OrderViewSet, basename="order")
+router.register("tickets", TicketViewSet, basename="ticket")
 
 urlpatterns = [path("", include(router.urls))]
 
