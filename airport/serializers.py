@@ -146,10 +146,12 @@ class TicketSeatsSerializer(TicketSerializer):
 
 
 class TicketCreateSerializer(serializers.ModelSerializer):
-    flight = serializers.CharField(source="flight.route", read_only=True)
+    flight = serializers.PrimaryKeyRelatedField(queryset=Flight.objects.all(), write_only=True)
+    flight_route = serializers.CharField(source="flight.route", read_only=True)
+
     class Meta:
         model = Ticket
-        fields = ("flight", "row", "seat")
+        fields = ("flight", "flight_route", "row", "seat")
 
 
 class OrderSerializer(serializers.ModelSerializer):
