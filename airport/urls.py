@@ -1,7 +1,15 @@
 from django.urls import path, include
 
-from airport.views import AirportViewSet, RouteViewSet, AirplaneTypeViewSet, AirplaneViewSet, CrewViewSet, OrderViewSet, \
-    FlightViewSet, TicketViewSet
+from airport.views import (
+    AirportViewSet,
+    RouteViewSet,
+    AirplaneTypeViewSet,
+    AirplaneViewSet,
+    CrewViewSet,
+    OrderViewSet,
+    FlightViewSet,
+    TicketViewSet,
+)
 
 from rest_framework import routers
 

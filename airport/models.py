@@ -70,9 +70,7 @@ class Crew(models.Model):
 
 
 class Flight(models.Model):
-    route = models.ForeignKey(
-        Route, on_delete=models.CASCADE, related_name="flights"
-    )
+    route = models.ForeignKey(Route, on_delete=models.CASCADE, related_name="flights")
     airplane = models.ForeignKey(
         Airplane, on_delete=models.CASCADE, related_name="flights"
     )
@@ -81,15 +79,12 @@ class Flight(models.Model):
     crews = models.ManyToManyField(Crew, related_name="flights")
 
     def __str__(self):
-        return (f"{self.route}. Arrives to "
-                f"{self.airplane} at {self.arrival_time}")
+        return f"{self.route}. Arrives to " f"{self.airplane} at {self.arrival_time}"
 
 
 class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
-    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ["-created_at"]
@@ -101,17 +96,12 @@ class Order(models.Model):
 class Ticket(models.Model):
     row = models.PositiveIntegerField()
     seat = models.PositiveIntegerField()
-    flight = models.ForeignKey(
-        Flight, on_delete=models.CASCADE, related_name="tickets"
-    )
-    order = models.ForeignKey(
-        Order, on_delete=models.CASCADE, related_name="tickets"
-    )
+    flight = models.ForeignKey(Flight, on_delete=models.CASCADE, related_name="tickets")
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="tickets")
 
     class Meta:
         unique_together = ("flight", "row", "seat")
         ordering = ("row", "seat")
-
 
     @staticmethod
     def validate_ticket(row: int, seat: int, airplane: Airplane, error_to_raise):
@@ -140,13 +130,13 @@ class Ticket(models.Model):
         )
 
     def save(
-            self,
-            force_insert=False,
-            force_update=False,
-            using=None,
-            update_fields=None,
-            *args,
-            **kwargs,
+        self,
+        force_insert=False,
+        force_update=False,
+        using=None,
+        update_fields=None,
+        *args,
+        **kwargs,
     ):
         self.full_clean()
         return super().save(

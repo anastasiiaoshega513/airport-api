@@ -57,9 +57,15 @@ class UnauthenticatedAndAuthenticatedRouteApiTests(TestCase):
             closest_big_city="Barcelona",
         )
 
-        self.route1 = sample_route(source=self.kyiv_airport, destination=self.barcelona_airport)
-        self.route2 = sample_route(source=self.kyiv_airport, destination=self.paris_airport)
-        self.route3 = sample_route(source=self.paris_airport, destination=self.barcelona_airport)
+        self.route1 = sample_route(
+            source=self.kyiv_airport, destination=self.barcelona_airport
+        )
+        self.route2 = sample_route(
+            source=self.kyiv_airport, destination=self.paris_airport
+        )
+        self.route3 = sample_route(
+            source=self.paris_airport, destination=self.barcelona_airport
+        )
 
     def test_list_routes(self):
         res = self.client.get(ROUTE_URL)
@@ -68,9 +74,7 @@ class UnauthenticatedAndAuthenticatedRouteApiTests(TestCase):
         self.assertEqual(len(res.data), 3)
 
     def test_filter_routes_by_source_name(self):
-        res = self.client.get(
-            ROUTE_URL, {"source_name": "boryspil"}
-        )
+        res = self.client.get(ROUTE_URL, {"source_name": "boryspil"})
 
         serializer1 = RouteListSerializer(self.route1)
         serializer2 = RouteListSerializer(self.route2)
@@ -81,9 +85,7 @@ class UnauthenticatedAndAuthenticatedRouteApiTests(TestCase):
         self.assertNotIn(serializer3.data, res.data)
 
     def test_filter_routes_by_destination_name(self):
-        res = self.client.get(
-            ROUTE_URL, {"destination_name": "prat"}
-        )
+        res = self.client.get(ROUTE_URL, {"destination_name": "prat"})
 
         serializer1 = RouteListSerializer(self.route1)
         serializer2 = RouteListSerializer(self.route2)
@@ -94,9 +96,7 @@ class UnauthenticatedAndAuthenticatedRouteApiTests(TestCase):
         self.assertNotIn(serializer2.data, res.data)
 
     def test_filter_routes_by_source_city(self):
-        res = self.client.get(
-            ROUTE_URL, {"source_city": "kyiv"}
-        )
+        res = self.client.get(ROUTE_URL, {"source_city": "kyiv"})
 
         serializer1 = RouteListSerializer(self.route1)
         serializer2 = RouteListSerializer(self.route2)
@@ -107,9 +107,7 @@ class UnauthenticatedAndAuthenticatedRouteApiTests(TestCase):
         self.assertNotIn(serializer3.data, res.data)
 
     def test_filter_routes_by_destination_city(self):
-        res = self.client.get(
-            ROUTE_URL, {"destination_city": "paris"}
-        )
+        res = self.client.get(ROUTE_URL, {"destination_city": "paris"})
 
         serializer1 = RouteListSerializer(self.route1)
         serializer2 = RouteListSerializer(self.route2)
@@ -129,6 +127,7 @@ class UnauthenticatedAndAuthenticatedRouteApiTests(TestCase):
         }
         res = self.client.post(ROUTE_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
 
 class AdminRouteApiTests(TestCase):
     def setUp(self):

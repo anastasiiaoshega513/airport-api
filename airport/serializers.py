@@ -1,7 +1,16 @@
 from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from airport.models import Airport, Route, AirplaneType, Airplane, Crew, Flight, Order, Ticket
+from airport.models import (
+    Airport,
+    Route,
+    AirplaneType,
+    Airplane,
+    Crew,
+    Flight,
+    Order,
+    Ticket,
+)
 
 
 class AirportSerializer(serializers.ModelSerializer):
@@ -18,9 +27,7 @@ class RouteSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         Route.validate_route(
-            attrs["source"],
-            attrs["destination"],
-            serializers.ValidationError
+            attrs["source"], attrs["destination"], serializers.ValidationError
         )
         return attrs
 
@@ -82,9 +89,7 @@ class FlightSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Flight
-        fields = (
-            "id", "route", "airplane", "departure_time", "arrival_time", "crews"
-        )
+        fields = ("id", "route", "airplane", "departure_time", "arrival_time", "crews")
 
 
 class FlightListSerializer(serializers.ModelSerializer):
@@ -94,22 +99,27 @@ class FlightListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Flight
-        fields = (
-            "id", "route", "airplane", "departure_time", "arrival_time", "crews"
-        )
+        fields = ("id", "route", "airplane", "departure_time", "arrival_time", "crews")
 
 
 class FlightDetailSerializer(serializers.ModelSerializer):
     crews = serializers.StringRelatedField(many=True, read_only=True)
     route = serializers.StringRelatedField(read_only=True)
     airplane = AirplaneDetailSerializer(read_only=True)
-    distance = serializers.FloatField(source="route.distance",read_only=True)
+    distance = serializers.FloatField(source="route.distance", read_only=True)
     available_seats = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Flight
         fields = (
-            "id", "route", "distance", "airplane", "departure_time", "arrival_time", "crews", "available_seats"
+            "id",
+            "route",
+            "distance",
+            "airplane",
+            "departure_time",
+            "arrival_time",
+            "crews",
+            "available_seats",
         )
 
 
@@ -119,10 +129,7 @@ class TicketSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         data = super(TicketSerializer, self).validate(attrs=attrs)
         Ticket.validate_ticket(
-            attrs["row"],
-            attrs["seat"],
-            attrs["flight"].airplane,
-            ValidationError
+            attrs["row"], attrs["seat"], attrs["flight"].airplane, ValidationError
         )
         return data
 
@@ -146,7 +153,9 @@ class TicketSeatsSerializer(TicketSerializer):
 
 
 class TicketCreateSerializer(serializers.ModelSerializer):
-    flight = serializers.PrimaryKeyRelatedField(queryset=Flight.objects.all(), write_only=True)
+    flight = serializers.PrimaryKeyRelatedField(
+        queryset=Flight.objects.all(), write_only=True
+    )
     flight_route = serializers.CharField(source="flight.route", read_only=True)
 
     class Meta:

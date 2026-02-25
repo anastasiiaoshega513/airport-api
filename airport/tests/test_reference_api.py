@@ -6,10 +6,12 @@ from rest_framework.test import APIClient
 from rest_framework import status
 
 from airport.models import Airport, AirplaneType, Airplane, Crew
-from airport.serializers import (AirportSerializer,
-                                 AirplaneDetailSerializer,
-                                 AirplaneTypeSerializer,
-                                 CrewSerializer)
+from airport.serializers import (
+    AirportSerializer,
+    AirplaneDetailSerializer,
+    AirplaneTypeSerializer,
+    CrewSerializer,
+)
 
 AIRPORT_URL = reverse("airport:airport-list")
 AIRPLANE_TYPE_URL = reverse("airport:airplane-type-list")
@@ -56,19 +58,27 @@ def sample_crew(**params):
 def airport_detail_url(airport_id):
     return reverse("airport:airport-detail", args=[airport_id])
 
+
 def airplane_type_detail_url(airplane_type_id):
     return reverse("airport:airplane-type-detail", args=[airplane_type_id])
+
 
 def airplane_detail_url(airplane_id):
     return reverse("airport:airplane-detail", args=[airplane_id])
 
+
 def crew_detail_url(crew_id):
     return reverse("airport:crew-detail", args=[crew_id])
 
+
 class AirportApiTests(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(email="user@test.com", password="pass1234")
-        self.admin = get_user_model().objects.create_superuser(email="admin@test.com", password="pass1234")
+        self.user = get_user_model().objects.create_user(
+            email="user@test.com", password="pass1234"
+        )
+        self.admin = get_user_model().objects.create_superuser(
+            email="admin@test.com", password="pass1234"
+        )
 
     def test_list_airports(self):
         self.client = APIClient()
@@ -111,8 +121,12 @@ class AirportApiTests(TestCase):
 
 class AirplaneApiTests(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(email="user@test.com", password="pass1234")
-        self.admin = get_user_model().objects.create_superuser(email="admin@test.com", password="pass1234")
+        self.user = get_user_model().objects.create_user(
+            email="user@test.com", password="pass1234"
+        )
+        self.admin = get_user_model().objects.create_superuser(
+            email="admin@test.com", password="pass1234"
+        )
 
     def test_list_airplanes(self):
         self.client = APIClient()
@@ -159,8 +173,12 @@ class AirplaneApiTests(TestCase):
 
 class AirplaneTypeApiTests(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(email="user@test.com", password="pass1234")
-        self.admin = get_user_model().objects.create_superuser(email="admin@test.com", password="pass1234")
+        self.user = get_user_model().objects.create_user(
+            email="user@test.com", password="pass1234"
+        )
+        self.admin = get_user_model().objects.create_superuser(
+            email="admin@test.com", password="pass1234"
+        )
 
     def test_list_airplane_types(self):
         self.client = APIClient()
@@ -201,8 +219,12 @@ class AirplaneTypeApiTests(TestCase):
 
 class CrewApiTests(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(email="user@test.com", password="pass1234")
-        self.admin = get_user_model().objects.create_superuser(email="admin@test.com", password="pass1234")
+        self.user = get_user_model().objects.create_user(
+            email="user@test.com", password="pass1234"
+        )
+        self.admin = get_user_model().objects.create_superuser(
+            email="admin@test.com", password="pass1234"
+        )
 
     def test_list_crews(self):
         self.client = APIClient()

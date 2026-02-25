@@ -19,8 +19,10 @@ def create_user(password="testpass"):
     email = f"{uuid.uuid4()}@test.com"
     return get_user_model().objects.create_user(email, password)
 
+
 def auth(client, user):
     client.force_authenticate(user=user)
+
 
 def sample_order(**params):
     defaults = {
@@ -33,6 +35,7 @@ def sample_order(**params):
 
 def order_detail_url(order_id):
     return reverse("airport:order-detail", args=[order_id])
+
 
 def ticket_detail_url(ticket_id):
     return reverse("airport:ticket-detail", args=[ticket_id])
@@ -69,9 +72,7 @@ class AuthenticatedOrderApiTests(TestCase):
 
     def test_create_order_without_tickets(self):
         self.client.force_authenticate(user=self.user1)
-        payload = {
-            "tickets": []
-        }
+        payload = {"tickets": []}
         res = self.client.post(ORDER_URL, payload, format="json")
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -92,7 +93,6 @@ class AuthenticatedOrderApiTests(TestCase):
         self.assertIn(order1.id, orders_ids)
         self.assertNotIn(order2.id, orders_ids)
 
-
     def test_retrieve_order_detail(self):
         order = sample_order(user=self.user1)
         Ticket.objects.create(order=order, flight=sample_flight(), row=1, seat=1)
@@ -109,8 +109,12 @@ class AuthenticatedOrderApiTests(TestCase):
 
         order1 = sample_order(user=self.user1)
         order2 = sample_order(user=self.user2)
-        ticket1 = Ticket.objects.create(order=order1, flight=sample_flight(), row=1, seat=1)
-        ticket2 = Ticket.objects.create(order=order2, flight=sample_flight(), row=1, seat=2)
+        ticket1 = Ticket.objects.create(
+            order=order1, flight=sample_flight(), row=1, seat=1
+        )
+        ticket2 = Ticket.objects.create(
+            order=order2, flight=sample_flight(), row=1, seat=2
+        )
 
         res = self.client.get(TICKET_URL)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -119,10 +123,11 @@ class AuthenticatedOrderApiTests(TestCase):
         self.assertIn(ticket1.id, tickets_ids)
         self.assertNotIn(ticket2.id, tickets_ids)
 
-
     def test_retrieve_ticket_detail(self):
         order = sample_order(user=self.user1)
-        ticket = Ticket.objects.create(order=order, flight=sample_flight(), row=1, seat=1)
+        ticket = Ticket.objects.create(
+            order=order, flight=sample_flight(), row=1, seat=1
+        )
 
         url = ticket_detail_url(ticket.id)
         res = self.client.get(url)

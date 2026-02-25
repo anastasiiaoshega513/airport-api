@@ -7,7 +7,11 @@ from rest_framework import status
 
 from airport.models import Flight
 from airport.serializers import FlightListSerializer
-from airport.tests.test_reference_api import sample_crew, sample_airplane, sample_airplane_type
+from airport.tests.test_reference_api import (
+    sample_crew,
+    sample_airplane,
+    sample_airplane_type,
+)
 from airport.tests.test_route_api import sample_route, sample_airport
 
 FLIGHT_URL = reverse("airport:flight-list")
@@ -33,8 +37,12 @@ def flight_detail_url(flight_id):
 
 class FlightGeneralApiTests(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(email="user@test.com", password="pass1234")
-        self.admin = get_user_model().objects.create_superuser(email="admin@test.com", password="pass1234")
+        self.user = get_user_model().objects.create_user(
+            email="user@test.com", password="pass1234"
+        )
+        self.admin = get_user_model().objects.create_superuser(
+            email="admin@test.com", password="pass1234"
+        )
 
     def test_list_flights(self):
         self.client = APIClient()
@@ -71,7 +79,10 @@ class FlightGeneralApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertIn("available_seats", res.data)
-        self.assertEqual(res.data["available_seats"], flight.airplane.rows * flight.airplane.seats_in_row)
+        self.assertEqual(
+            res.data["available_seats"],
+            flight.airplane.rows * flight.airplane.seats_in_row,
+        )
 
     def test_admin_create_flight_allowed(self):
         self.client = APIClient()
@@ -95,7 +106,9 @@ class FlightGeneralApiTests(TestCase):
         flight = Flight.objects.get(id=res.data["id"])
         self.assertEqual(flight.route_id, route.id)
         self.assertEqual(flight.airplane_id, airplane.id)
-        self.assertEqual(set(flight.crews.values_list("id", flat=True)), {crew1.id, crew2.id})
+        self.assertEqual(
+            set(flight.crews.values_list("id", flat=True)), {crew1.id, crew2.id}
+        )
 
 
 class FlightFilterApiTestCase(TestCase):
@@ -120,18 +133,22 @@ class FlightFilterApiTestCase(TestCase):
             closest_big_city="Barcelona",
         )
 
-        self.route1 = sample_route(source=self.kyiv_airport, destination=self.barcelona_airport)
-        self.route2 = sample_route(source=self.kyiv_airport, destination=self.paris_airport)
-        self.route3 = sample_route(source=self.paris_airport, destination=self.barcelona_airport)
+        self.route1 = sample_route(
+            source=self.kyiv_airport, destination=self.barcelona_airport
+        )
+        self.route2 = sample_route(
+            source=self.kyiv_airport, destination=self.paris_airport
+        )
+        self.route3 = sample_route(
+            source=self.paris_airport, destination=self.barcelona_airport
+        )
 
         self.flight1 = sample_flight(route=self.route1)
         self.flight2 = sample_flight(route=self.route2)
         self.flight3 = sample_flight(route=self.route3)
 
     def test_filter_flights_by_source_name(self):
-        res = self.client.get(
-            FLIGHT_URL, {"source_name": "boryspil"}
-        )
+        res = self.client.get(FLIGHT_URL, {"source_name": "boryspil"})
 
         serializer1 = FlightListSerializer(self.flight1)
         serializer2 = FlightListSerializer(self.flight2)
@@ -142,9 +159,7 @@ class FlightFilterApiTestCase(TestCase):
         self.assertNotIn(serializer3.data, res.data["results"])
 
     def test_filter_flights_by_destination_name(self):
-        res = self.client.get(
-            FLIGHT_URL, {"destination_name": "prat"}
-        )
+        res = self.client.get(FLIGHT_URL, {"destination_name": "prat"})
 
         serializer1 = FlightListSerializer(self.flight1)
         serializer2 = FlightListSerializer(self.flight2)
@@ -155,9 +170,7 @@ class FlightFilterApiTestCase(TestCase):
         self.assertNotIn(serializer2.data, res.data["results"])
 
     def test_filter_flights_by_source_city(self):
-        res = self.client.get(
-            FLIGHT_URL, {"source_city": "kyiv"}
-        )
+        res = self.client.get(FLIGHT_URL, {"source_city": "kyiv"})
 
         serializer1 = FlightListSerializer(self.flight1)
         serializer2 = FlightListSerializer(self.flight2)
@@ -168,9 +181,7 @@ class FlightFilterApiTestCase(TestCase):
         self.assertNotIn(serializer3.data, res.data["results"])
 
     def test_filter_flights_by_destination_city(self):
-        res = self.client.get(
-            FLIGHT_URL, {"destination_city": "paris"}
-        )
+        res = self.client.get(FLIGHT_URL, {"destination_city": "paris"})
 
         serializer1 = FlightListSerializer(self.flight1)
         serializer2 = FlightListSerializer(self.flight2)

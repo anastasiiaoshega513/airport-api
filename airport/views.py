@@ -1,19 +1,45 @@
 from django.db.models import F, Count, Prefetch
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse, OpenApiExample
+from drf_spectacular.utils import (
+    extend_schema,
+    OpenApiParameter,
+    OpenApiResponse,
+    OpenApiExample,
+)
 from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from airport.models import Airport, Route, AirplaneType, Airplane, Crew, Flight, Order, Ticket
+from airport.models import (
+    Airport,
+    Route,
+    AirplaneType,
+    Airplane,
+    Crew,
+    Flight,
+    Order,
+    Ticket,
+)
 from airport.permissions import IsAdminOrReadOnly
-from airport.serializers import (AirportSerializer, RouteSerializer, AirplaneTypeSerializer,
-                                 AirplaneSerializer, CrewSerializer, FlightSerializer,
-                                 OrderSerializer, TicketSerializer, RouteListSerializer,
-                                 AirplaneListSerializer, FlightListSerializer, FlightDetailSerializer,
-                                 AirplaneDetailSerializer, TicketSeatsSerializer, OrderListSerializer,
-                                 TicketListSerializer)
+from airport.serializers import (
+    AirportSerializer,
+    RouteSerializer,
+    AirplaneTypeSerializer,
+    AirplaneSerializer,
+    CrewSerializer,
+    FlightSerializer,
+    OrderSerializer,
+    TicketSerializer,
+    RouteListSerializer,
+    AirplaneListSerializer,
+    FlightListSerializer,
+    FlightDetailSerializer,
+    AirplaneDetailSerializer,
+    TicketSeatsSerializer,
+    OrderListSerializer,
+    TicketListSerializer,
+)
 
 
 class AirportViewSet(viewsets.ModelViewSet):
@@ -44,7 +70,9 @@ class RouteViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(source__closest_big_city__icontains=source_city)
 
         if destination_city:
-            queryset = queryset.filter(destination__closest_big_city__icontains=destination_city)
+            queryset = queryset.filter(
+                destination__closest_big_city__icontains=destination_city
+            )
 
         return queryset.distinct()
 
@@ -112,16 +140,19 @@ class DefaultPagination(PageNumberPagination):
 
 
 class FlightViewSet(viewsets.ModelViewSet):
-    queryset = Flight.objects.select_related(
+    queryset = (
+        Flight.objects.select_related(
             "route__source",
             "route__destination",
             "airplane",
-        ).prefetch_related("crews").annotate(
+        )
+        .prefetch_related("crews")
+        .annotate(
             available_seats=(
-                F("airplane__rows") * F("airplane__seats_in_row")
-                - Count("tickets")
+                F("airplane__rows") * F("airplane__seats_in_row") - Count("tickets")
             )
         )
+    )
     pagination_class = DefaultPagination
     permission_classes = (IsAdminOrReadOnly,)
 
@@ -137,13 +168,19 @@ class FlightViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(route__source__name__icontains=source_name)
 
         if destination_name:
-            queryset = queryset.filter(route__destination__name__icontains=destination_name)
+            queryset = queryset.filter(
+                route__destination__name__icontains=destination_name
+            )
 
         if source_city:
-            queryset = queryset.filter(route__source__closest_big_city__icontains=source_city)
+            queryset = queryset.filter(
+                route__source__closest_big_city__icontains=source_city
+            )
 
         if destination_city:
-            queryset = queryset.filter(route__destination__closest_big_city__icontains=destination_city)
+            queryset = queryset.filter(
+                route__destination__closest_big_city__icontains=destination_city
+            )
 
         return queryset.distinct()
 
@@ -180,9 +217,7 @@ class FlightViewSet(viewsets.ModelViewSet):
         flight = self.get_object()
         airplane = flight.airplane
 
-        taken = set(
-            Ticket.objects.filter(flight=flight).values_list("row", "seat")
-        )
+        taken = set(Ticket.objects.filter(flight=flight).values_list("row", "seat"))
         available = []
         for row in range(1, airplane.rows + 1):
             for seat in range(1, airplane.seats_in_row + 1):
@@ -219,19 +254,17 @@ class FlightViewSet(viewsets.ModelViewSet):
         return super().list(request, *args, **kwargs)
 
 
-class TicketViewSet(mixins.ListModelMixin,
-                    mixins.RetrieveModelMixin,
-                    viewsets.GenericViewSet):
+class TicketViewSet(
+    mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
     queryset = Ticket.objects.select_related(
         "flight",
         "flight__route",
         "flight__route__source",
         "flight__route__destination",
         "flight__airplane",
-        "order"
-    ).prefetch_related(
-        "flight__crews"
-    )
+        "order",
+    ).prefetch_related("flight__crews")
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
@@ -254,16 +287,14 @@ class OrderViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        tickets_qs = (Ticket.objects.select_related(
-                "flight",
-                "flight__route",
-                "flight__route__source",
-                "flight__route__destination",
-            )
+        tickets_qs = Ticket.objects.select_related(
+            "flight",
+            "flight__route",
+            "flight__route__source",
+            "flight__route__destination",
         )
         return (
-            Order.objects
-            .filter(user=self.request.user)
+            Order.objects.filter(user=self.request.user)
             .prefetch_related(Prefetch("tickets", queryset=tickets_qs))
             .order_by("-created_at")
         )
