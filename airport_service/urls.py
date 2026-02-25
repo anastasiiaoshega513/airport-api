@@ -16,6 +16,7 @@ Including another URLconf
 """
 
 from django.contrib import admin
+from django.http import JsonResponse
 from django.urls import path, include
 from drf_spectacular.views import (
     SpectacularAPIView,
@@ -23,7 +24,11 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 
+def health(request):
+    return JsonResponse({"status": "ok"})
+
 urlpatterns = [
+    path("", health),
     path("admin/", admin.site.urls),
     path("api/airport/", include("airport.urls", namespace="airport")),
     path("api/user/", include("user.urls", namespace="user")),
