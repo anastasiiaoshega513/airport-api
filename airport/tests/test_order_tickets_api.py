@@ -65,7 +65,6 @@ class AuthenticatedOrderApiTests(TestCase):
             ]
         }
         res = self.client.post(ORDER_URL, payload, format="json")
-        print(res.status_code, res.data)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
     def test_create_order_without_tickets(self):
@@ -90,7 +89,6 @@ class AuthenticatedOrderApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
         orders_ids = {order["id"] for order in res.data["results"]}
-        print(res.status_code, res.data)
         self.assertIn(order1.id, orders_ids)
         self.assertNotIn(order2.id, orders_ids)
 
