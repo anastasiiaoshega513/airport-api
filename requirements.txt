@@ -17,8 +17,8 @@ jsonschema==4.26.0
 jsonschema-specifications==2025.9.1
 mccabe==0.7.0
 packaging==26.0
-psycopg==3.2.6
-psycopg-binary==3.2.6
+psycopg==3.2.13
+psycopg-binary==3.2.13
 psycopg2-binary==2.9.11
 pycodestyle==2.14.0
 pyflakes==3.4.0
