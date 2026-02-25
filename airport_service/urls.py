@@ -14,7 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-
+from django.conf import settings
 from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import path, include
@@ -29,7 +29,6 @@ def health(request):
 
 urlpatterns = [
     path("", health),
-    path("admin/", admin.site.urls),
     path("api/airport/", include("airport.urls", namespace="airport")),
     path("api/user/", include("user.urls", namespace="user")),
     path("__debug__/", include("debug_toolbar.urls")),
@@ -43,3 +42,8 @@ urlpatterns = [
         "api/doc/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"
     ),
 ]
+
+if settings.DEBUG:
+    urlpatterns += [
+        path("admin/", admin.site.urls),
+    ]

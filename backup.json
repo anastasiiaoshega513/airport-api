@@ -1,0 +1,265 @@
+[
+{
+  "model": "airport.airport",
+  "pk": 1,
+  "fields": {
+    "name": "Boryspil International Airport",
+    "closest_big_city": "Kyiv"
+  }
+},
+{
+  "model": "airport.airport",
+  "pk": 2,
+  "fields": {
+    "name": "Barcelona–El Prat Airport",
+    "closest_big_city": "Barcelona"
+  }
+},
+{
+  "model": "airport.airport",
+  "pk": 3,
+  "fields": {
+    "name": "Charles de Gaulle Airport",
+    "closest_big_city": "Paris"
+  }
+},
+{
+  "model": "airport.route",
+  "pk": 1,
+  "fields": {
+    "source": 1,
+    "destination": 2,
+    "distance": 2390
+  }
+},
+{
+  "model": "airport.route",
+  "pk": 2,
+  "fields": {
+    "source": 2,
+    "destination": 3,
+    "distance": 860
+  }
+},
+{
+  "model": "airport.airplanetype",
+  "pk": 1,
+  "fields": {
+    "name": "Boeing 737"
+  }
+},
+{
+  "model": "airport.airplanetype",
+  "pk": 2,
+  "fields": {
+    "name": "Airbus A320"
+  }
+},
+{
+  "model": "airport.airplane",
+  "pk": 1,
+  "fields": {
+    "name": "Skybird 12",
+    "rows": 30,
+    "seats_in_row": 6,
+    "airplane_type": 1
+  }
+},
+{
+  "model": "airport.airplane",
+  "pk": 2,
+  "fields": {
+    "name": "BlueWave 7",
+    "rows": 28,
+    "seats_in_row": 6,
+    "airplane_type": 2
+  }
+},
+{
+  "model": "airport.crew",
+  "pk": 1,
+  "fields": {
+    "first_name": "Anna",
+    "last_name": "Koval"
+  }
+},
+{
+  "model": "airport.crew",
+  "pk": 2,
+  "fields": {
+    "first_name": "Mark",
+    "last_name": "Shevchenko"
+  }
+},
+{
+  "model": "airport.crew",
+  "pk": 3,
+  "fields": {
+    "first_name": "Iryna",
+    "last_name": "Bondar"
+  }
+},
+{
+  "model": "airport.flight",
+  "pk": 1,
+  "fields": {
+    "route": 1,
+    "airplane": 1,
+    "departure_time": "2026-02-26T22:30:00Z",
+    "arrival_time": "2026-02-27T00:45:00Z",
+    "crews": [
+      1,
+      2
+    ]
+  }
+},
+{
+  "model": "airport.flight",
+  "pk": 2,
+  "fields": {
+    "route": 2,
+    "airplane": 2,
+    "departure_time": "2026-02-12T03:00:00Z",
+    "arrival_time": "2026-02-13T05:50:00Z",
+    "crews": [
+      2,
+      3
+    ]
+  }
+},
+{
+  "model": "airport.order",
+  "pk": 1,
+  "fields": {
+    "created_at": "2026-02-23T10:17:33.469Z",
+    "user": 1
+  }
+},
+{
+  "model": "airport.order",
+  "pk": 2,
+  "fields": {
+    "created_at": "2026-02-24T16:03:25.491Z",
+    "user": 3
+  }
+},
+{
+  "model": "airport.order",
+  "pk": 3,
+  "fields": {
+    "created_at": "2026-02-24T16:03:59.978Z",
+    "user": 3
+  }
+},
+{
+  "model": "airport.ticket",
+  "pk": 1,
+  "fields": {
+    "row": 1,
+    "seat": 2,
+    "flight": 1,
+    "order": 1
+  }
+},
+{
+  "model": "airport.ticket",
+  "pk": 2,
+  "fields": {
+    "row": 1,
+    "seat": 3,
+    "flight": 1,
+    "order": 1
+  }
+},
+{
+  "model": "airport.ticket",
+  "pk": 3,
+  "fields": {
+    "row": 1,
+    "seat": 1,
+    "flight": 2,
+    "order": 2
+  }
+},
+{
+  "model": "airport.ticket",
+  "pk": 4,
+  "fields": {
+    "row": 1,
+    "seat": 2,
+    "flight": 2,
+    "order": 2
+  }
+},
+{
+  "model": "airport.ticket",
+  "pk": 5,
+  "fields": {
+    "row": 3,
+    "seat": 1,
+    "flight": 2,
+    "order": 3
+  }
+},
+{
+  "model": "airport.ticket",
+  "pk": 6,
+  "fields": {
+    "row": 3,
+    "seat": 2,
+    "flight": 2,
+    "order": 3
+  }
+},
+{
+  "model": "user.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$XjRl9HdnzEMYb9myBgBmb9$wSG8P8C5JNkf2RD+Oefow0NH2Pt3tZdX5mmjr/F6LHU=",
+    "last_login": "2026-02-21T14:56:34.105Z",
+    "is_superuser": true,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-02-21T14:56:28.866Z",
+    "email": "admin@admin.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user.user",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$XNV0IoArwwyqmA4JiDH8a9$HdJ7lZLfw10oRwXGXaKO6oLdENkAX9/UZq1okr3Z8w4=",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-02-22T17:04:07.254Z",
+    "email": "alex@gmail.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user.user",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$bqty9INUTmk0epHankiPU5$6OEfii7PFadn+rerrM4wtf5Y8d+Insmlv+MilxBaPX8=",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-02-22T17:20:26.903Z",
+    "email": "monika@gmail.com",
+    "groups": [],
+    "user_permissions": []
+  }
+}
+]
