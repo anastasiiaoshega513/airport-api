@@ -60,6 +60,14 @@ python manage.py runserver
 }
 ```
 
+## Run with Docker
+
+This project can be run locally using Docker (Django + PostgreSQL).
+
+```bash
+docker compose up --build
+```
+
 ## Postman
 
 This repository includes ready-to-use Postman files:
