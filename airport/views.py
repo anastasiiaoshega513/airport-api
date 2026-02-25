@@ -1,5 +1,7 @@
 from django.db.models import F, Count, Prefetch
-from rest_framework import viewsets
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse, OpenApiExample
+from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -50,6 +52,33 @@ class RouteViewSet(viewsets.ModelViewSet):
         if self.action in ("list", "retrieve"):
             return RouteListSerializer
         return RouteSerializer
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "source_name",
+                type=OpenApiTypes.STR,
+                description="Filter by source airport name (ex. ?source_name=boryspil)",
+            ),
+            OpenApiParameter(
+                "destination_name",
+                type=OpenApiTypes.STR,
+                description="Filter by destination airport name (ex. ?destination_name=barcelona)",
+            ),
+            OpenApiParameter(
+                "source_city",
+                type=OpenApiTypes.STR,
+                description="Filter by source city (ex. ?source_city=kyiv)",
+            ),
+            OpenApiParameter(
+                "destination_city",
+                type=OpenApiTypes.STR,
+                description="Filter by destination city (ex. ?destination_city=paris)",
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class AirplaneTypeViewSet(viewsets.ModelViewSet):
@@ -127,6 +156,21 @@ class FlightViewSet(viewsets.ModelViewSet):
             return TicketSeatsSerializer
         return FlightSerializer
 
+    @extend_schema(
+        summary="Available seats on flight",
+        description="A list of available seats on selected flight will be returned",
+        responses={
+            200: TicketSeatsSerializer(many=True),
+            404: OpenApiResponse(description="Flight not found"),
+        },
+        examples=[
+            OpenApiExample(
+                "Example",
+                value=[{"row": 1, "seat": 1}, {"row": 1, "seat": 2}],
+                response_only=True,
+            )
+        ],
+    )
     @action(
         detail=True,
         methods=["get"],
@@ -147,8 +191,37 @@ class FlightViewSet(viewsets.ModelViewSet):
 
         return Response(available)
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "source_name",
+                type=OpenApiTypes.STR,
+                description="Filter by source airport name (ex. ?source_name=boryspil)",
+            ),
+            OpenApiParameter(
+                "destination_name",
+                type=OpenApiTypes.STR,
+                description="Filter by destination airport name (ex. ?destination_name=barcelona)",
+            ),
+            OpenApiParameter(
+                "source_city",
+                type=OpenApiTypes.STR,
+                description="Filter by source city (ex. ?source_city=kyiv)",
+            ),
+            OpenApiParameter(
+                "destination_city",
+                type=OpenApiTypes.STR,
+                description="Filter by destination city (ex. ?destination_city=paris)",
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
-class TicketViewSet(viewsets.ModelViewSet):
+
+class TicketViewSet(mixins.ListModelMixin,
+                    mixins.RetrieveModelMixin,
+                    viewsets.GenericViewSet):
     queryset = Ticket.objects.select_related(
         "flight",
         "flight__route",
