@@ -74,3 +74,7 @@ This repository includes ready-to-use Postman files:
 
 - [Postman Collection](postman/Airport_API.postman_collection.json)
 - [Postman Environment (Local)](postman/local.environment.json)
+
+## Link to deployed project
+
+[Project](https://airport-api-tc6c.onrender.com)
