@@ -232,6 +232,7 @@ class TicketViewSet(mixins.ListModelMixin,
     ).prefetch_related(
         "flight__crews"
     )
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -239,11 +240,6 @@ class TicketViewSet(mixins.ListModelMixin,
         if user.is_staff:
             return queryset
         return queryset.filter(order__user=user)
-
-    def get_permissions(self):
-        if self.action in ("list", "retrieve"):
-            return [IsAuthenticated()]
-        return [IsAdminUser()]
 
     def get_serializer_class(self):
         if self.action == "list":
